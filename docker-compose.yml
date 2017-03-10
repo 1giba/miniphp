@@ -1,0 +1,185 @@
+version: '2'
+
+services:
+
+### Applications Code Container #############################
+
+    applications:
+        container_name: code.dev
+        image: tianon/true
+        volumes:
+            # put your project folder
+            - ~/code/:/var/www/html
+
+### PHP 7.0 Container ###########################
+
+    php70:
+        container_name: php70.dev
+        build:
+            context: ./php70
+        volumes_from:
+            - applications
+        extra_hosts:
+            - "dockerhost:10.0.75.1"
+        ports:
+           - "2222:22"
+        tty: true
+
+### PHP-FPM 7.0 Container #######################################
+
+    php-fpm70:
+        container_name: php-fpm70.dev
+        build:
+            context: ./php-fpm70
+        volumes_from:
+            - applications
+        expose:
+            - "9000"
+        links:
+            - php70
+        extra_hosts:
+            - "dockerhost:10.0.75.1"
+        environment:
+            - PHP_IDE_CONFIG=serverName=laravel
+
+### Nginx Server Container ##################################
+
+    nginx:
+        container_name: nginx.dev
+        build:
+            context: ./nginx
+            args:
+                - PHP_UPSTREAM=php-fpm70.dev
+        volumes_from:
+            - applications
+        volumes:
+            - ./volumes/logs/nginx/:/var/log/nginx
+            - ./nginx/sites/:/etc/nginx/sites-available
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - php-fpm70
+
+### MySQL Container #########################################
+
+    mysql:
+        container_name: mysql.dev
+        image: mysql:5.7
+        volumes:
+            - ./volumes/mysql:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: docker
+            MYSQL_USER: docker
+            MYSQL_PASSWORD: docker
+
+### PostgreSQL Container ####################################
+
+    postgres:
+        container_name: postgres.dev
+        image: postgres:9.5-alpine
+        volumes:
+            - ./volumes/postgres:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: docker
+            POSTGRES_PASSWORD: docker
+
+### Redis Container #########################################
+
+    redis:
+        container_name: redis.dev
+        image: redis:3.2-alpine
+        volumes:
+            - ./volumes/redis:/data
+        ports:
+            - "6379:6379"
+
+### Memcached Container #####################################
+
+    memcached:
+        container_name: memcached.dev
+        image: memcached:1.4-alpine
+        volumes:
+            - ./volumes/memcached:/var/lib/memcached
+        ports:
+            - "11211:11211"
+        links:
+            - php-fpm70
+
+### RabbitMQ Container ######################################
+
+    rabbitmq:
+        container_name: rabbitmq.dev
+        image: rabbitmq:3.6-management-alpine
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        privileged: true
+        environment:
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+        links:
+            - php-fpm70
+
+### phpMyAdmin Container ####################################
+
+    phpmyadmin:
+        container_name: phpmyadmin.dev
+        image: phpmyadmin/phpmyadmin
+        environment:
+            PMA_ARBITRARY: 1
+            MYSQL_USER: docker
+            MYSQL_PASSWORD: docker
+            MYSQL_ROOT_PASSWORD: docker
+        ports:
+            - "8080:80"
+        links:
+            - "mysql:db"
+
+### pgAdmin Container #######################################
+
+    pgadmin:
+        container_name: pgadmin.dev
+        image: fenglc/pgadmin4
+        ports:
+            - "5050:5050"
+        links:
+            - postgres
+
+### ElasticSearch Container #################################
+
+    elasticsearch:
+        container_name: elastic.dev
+        image: elasticsearch:5.2-alpine
+        volumes:
+            - ./volumes/elasticsearch-data:/usr/share/elasticsearch/data
+            - ./volumes/elasticsearch-plugins:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        links:
+            - php-fpm70
+
+### Volumes Setup ###########################################
+
+volumes:
+    mysql:
+        driver: "local"
+    postgres:
+        driver: "local"
+    memcached:
+        driver: "local"
+    redis:
+        driver: "local"
+    phpmyadmin:
+        driver: "local"
+    elasticsearch-data:
+        driver: "local"
+    elasticsearch-plugins:
+        driver: "local"
+    sessions:
+        driver: "local"
