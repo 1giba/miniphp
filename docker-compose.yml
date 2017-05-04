@@ -65,7 +65,7 @@ services:
 
     mysql:
         container_name: mysql.dev
-        image: mysql:5.7
+        image: wangxian/alpine-mysql
         volumes:
             - ./volumes/mysql:/var/lib/mysql
         ports:
