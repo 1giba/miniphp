@@ -12,8 +12,8 @@ ENV PHP_MAX_POST        100M
 #####################################
 # PHP 7.0:
 #####################################
-RUN wget -O /etc/apk/keys/diego@hernandev.com-58b4c2e0.rsa.pub \
-    http://php-alpine.codecasts.rocks/repo/php-alpine.pub && \
+RUN wget -O /etc/apk/keys/php-alpine.rsa.pub \
+    http://php.codecasts.rocks/php-alpine.rsa.pub && \
     echo "http://php.codecasts.rocks/7.0" >> /etc/apk/repositories && \
     apk add --update \
         php7 \
