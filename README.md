@@ -1,5 +1,7 @@
 # miniphp
 
+**DEPRECATED** Use [1giba/dockerp](https://github.com/1giba/dockerp).
+
 A lightweight images set of docker to php developers.
 
 This set is largely inspired by [this](https://github.com/laradock/laradock) great package by @laradock.
