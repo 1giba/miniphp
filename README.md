@@ -1,6 +1,6 @@
 # miniphp
 
-**DEPRECATED** Use [1giba/dockerp](https://github.com/1giba/dockerp).
+**DEPRECATED** Use [1giba/docker-php4dev](https://github.com/1giba/docker-php4dev).
 
 A lightweight images set of docker to php developers.
 
