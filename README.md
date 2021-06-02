@@ -1,6 +1,6 @@
 # miniphp
 
-**DEPRECATED** Use [1giba/docker-php4dev](https://github.com/1giba/docker-php4dev).
+**DEPRECATED** Use [1codehappy/dset](https://github.com/1codehappy/dset).
 
 A lightweight images set of docker to php developers.
 
